@@ -41,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -290,6 +291,16 @@ fun SettingsSheet(
     onRightPromptChange: (String) -> Unit,
     onThemeChange: (ThemeOption) -> Unit,
 ) {
+    var apiKeyText by rememberSaveable { mutableStateOf(settings.apiKey) }
+    var modelText by rememberSaveable { mutableStateOf(settings.model) }
+    var leftPromptText by rememberSaveable { mutableStateOf(settings.leftPrompt) }
+    var rightPromptText by rememberSaveable { mutableStateOf(settings.rightPrompt) }
+
+    LaunchedEffect(settings.apiKey) { apiKeyText = settings.apiKey }
+    LaunchedEffect(settings.model) { modelText = settings.model }
+    LaunchedEffect(settings.leftPrompt) { leftPromptText = settings.leftPrompt }
+    LaunchedEffect(settings.rightPrompt) { rightPromptText = settings.rightPrompt }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -298,16 +309,22 @@ fun SettingsSheet(
     ) {
         Text(text = "Pengaturan", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
         TextFieldWithLabel(
-            value = settings.apiKey,
-            onValueChange = onApiKeyChange,
+            value = apiKeyText,
+            onValueChange = {
+                apiKeyText = it
+                onApiKeyChange(it)
+            },
             label = "API Key Gemini",
             placeholder = "Masukkan API key",
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
         TextFieldWithLabel(
-            value = settings.model,
-            onValueChange = onModelChange,
+            value = modelText,
+            onValueChange = {
+                modelText = it
+                onModelChange(it)
+            },
             label = "Model (default gemini-3.0-pro)",
             placeholder = "gemini-3.0-pro",
             singleLine = true,
@@ -326,8 +343,11 @@ fun SettingsSheet(
         }
         Text(text = "Gaya Terjemahan Natural")
         TextFieldWithLabel(
-            value = settings.leftPrompt,
-            onValueChange = onLeftPromptChange,
+            value = leftPromptText,
+            onValueChange = {
+                leftPromptText = it
+                onLeftPromptChange(it)
+            },
             label = "Prompt gaya natural",
             placeholder = DEFAULT_LEFT_PROMPT,
             singleLine = false,
@@ -337,8 +357,11 @@ fun SettingsSheet(
         )
         Text(text = "Gaya Terjemahan Semi Formal")
         TextFieldWithLabel(
-            value = settings.rightPrompt,
-            onValueChange = onRightPromptChange,
+            value = rightPromptText,
+            onValueChange = {
+                rightPromptText = it
+                onRightPromptChange(it)
+            },
             label = "Prompt gaya semi formal",
             placeholder = DEFAULT_RIGHT_PROMPT,
             singleLine = false,
