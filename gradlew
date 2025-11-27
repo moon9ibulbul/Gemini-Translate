@@ -57,7 +57,79 @@ cd `dirname "$PRG"`/ > /dev/null
 APP_HOME=`pwd -P`
 cd "$SAVED" > /dev/null
 
-CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+WRAPPER_JAR="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+WRAPPER_JAR_BASE64="$APP_HOME/gradle/wrapper/gradle-wrapper.jar.base64"
+WRAPPER_PROPERTIES="$APP_HOME/gradle/wrapper/gradle-wrapper.properties"
+
+decode_wrapper_jar() {
+    if [ ! -f "$WRAPPER_JAR_BASE64" ]; then
+        return 1
+    fi
+
+    if command -v base64 >/dev/null 2>&1; then
+        base64 --decode "$WRAPPER_JAR_BASE64" > "$WRAPPER_JAR" 2>/dev/null || rm -f "$WRAPPER_JAR"
+    elif command -v python3 >/dev/null 2>&1; then
+        python3 - <<PY
+import base64
+from pathlib import Path
+source = Path("$WRAPPER_JAR_BASE64")
+target = Path("$WRAPPER_JAR")
+target.write_bytes(base64.b64decode(source.read_bytes()))
+PY
+    else
+        warn "Neither base64 nor python3 is available to decode the Gradle wrapper JAR"
+    fi
+
+    if [ -f "$WRAPPER_JAR" ]; then
+        return 0
+    fi
+
+    return 1
+}
+
+ensure_wrapper_jar() {
+    if [ -f "$WRAPPER_JAR" ]; then
+        return
+    fi
+
+    [ -d "$APP_HOME/gradle/wrapper" ] || mkdir -p "$APP_HOME/gradle/wrapper"
+
+    if decode_wrapper_jar; then
+        return
+    fi
+
+    distributionUrl=""
+    if [ -f "$WRAPPER_PROPERTIES" ]; then
+        distributionUrl=`grep '^distributionUrl=' "$WRAPPER_PROPERTIES" | cut -d= -f2-`
+    fi
+
+    distributionVersion=""
+    if [ -n "$distributionUrl" ]; then
+        distributionVersion=`echo "$distributionUrl" | sed -n 's/.*gradle-\([^-]*\)-.*/\1/p'`
+    fi
+
+    if [ -z "$distributionVersion" ]; then
+        distributionVersion="8.14.3"
+    fi
+
+    wrapperUrl="https://repo.maven.apache.org/maven2/org/gradle/gradle-wrapper/${distributionVersion}/gradle-wrapper-${distributionVersion}.jar"
+    if command -v curl >/dev/null 2>&1; then
+        curl -sSfL "$wrapperUrl" -o "$WRAPPER_JAR" || warn "curl failed to download Gradle wrapper JAR"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -q "$wrapperUrl" -O "$WRAPPER_JAR" || warn "wget failed to download Gradle wrapper JAR"
+    else
+        warn "Neither curl nor wget is available to download the Gradle wrapper JAR"
+    fi
+
+    if [ ! -f "$WRAPPER_JAR" ]; then
+        warn "Could not obtain Gradle wrapper JAR from $wrapperUrl"
+        exit 1
+    fi
+}
+
+ensure_wrapper_jar
+
+CLASSPATH=$WRAPPER_JAR
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
