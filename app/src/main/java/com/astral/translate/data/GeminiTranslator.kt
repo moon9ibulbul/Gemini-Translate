@@ -1,7 +1,6 @@
 package com.astral.translate.data
 
 import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.type.Content
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -22,11 +21,7 @@ class GeminiTranslator {
         )
 
         val prompt = buildPrompt(stylePrompt, sanitizedText)
-        val response = generativeModel.generateContent(
-            Content.Builder()
-                .addText(prompt)
-                .build()
-        )
+        val response = generativeModel.generateContent(prompt)
         response.text?.trim() ?: "Tidak ada respons diterima."
     }
 

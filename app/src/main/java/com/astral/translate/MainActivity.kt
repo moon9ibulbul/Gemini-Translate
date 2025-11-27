@@ -17,8 +17,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -32,7 +32,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -244,7 +244,7 @@ fun TranslationCard(
                     Text(text = description, style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
                 IconButton(onClick = onCopy) {
-                    Icon(Icons.Default.ContentCopy, contentDescription = "Salin")
+                    Icon(Icons.Outlined.ContentCopy, contentDescription = "Salin")
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -275,7 +275,7 @@ fun TextFieldWithLabel(
         placeholder = { Text(text = placeholder) },
         singleLine = singleLine,
         modifier = modifier,
-        colors = TextFieldDefaults.outlinedTextFieldColors(),
+        colors = OutlinedTextFieldDefaults.colors(),
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions
     )
