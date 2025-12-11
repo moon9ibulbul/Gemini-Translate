@@ -21,11 +21,18 @@ class GeminiTranslator {
         )
 
         val chunks = chunkText(sanitizedText)
-        val translatedChunks = chunks.map { chunk ->
+        val translatedChunks = chunks.mapIndexed { index, chunk ->
             val prompt = buildPrompt(stylePrompt, chunk)
-            val response = generativeModel.generateContent(prompt)
-            val rawText = response.text?.trim() ?: "Tidak ada respons diterima."
-            postProcessTranslation(chunk, rawText)
+            try {
+                val response = generativeModel.generateContent(prompt)
+                val rawText = response.text?.trim() ?: "Tidak ada respons diterima."
+                postProcessTranslation(chunk, rawText)
+            } catch (e: Exception) {
+                throw IllegalStateException(
+                    "Gagal memproses terjemahan pada bagian ${index + 1} dari ${chunks.size}: ${e.message}",
+                    e,
+                )
+            }
         }
 
         translatedChunks.joinToString(separator = "\n")
@@ -63,20 +70,42 @@ class GeminiTranslator {
     private fun chunkText(text: String, maxChars: Int = 12_000): List<String> {
         if (text.length <= maxChars) return listOf(text)
 
-        val lines = text.lines()
         val chunks = mutableListOf<StringBuilder>()
         var current = StringBuilder()
 
-        for (line in lines) {
-            if (current.length + line.length + 1 > maxChars && current.isNotEmpty()) {
+        fun flushCurrent() {
+            if (current.isNotEmpty()) {
                 chunks.add(current)
                 current = StringBuilder()
             }
-            if (current.isNotEmpty()) current.append('\n')
-            current.append(line)
         }
 
-        if (current.isNotEmpty()) chunks.add(current)
+        fun appendSegment(segment: String) {
+            if (segment.isEmpty()) return
+
+            val needsNewLine = current.isNotEmpty()
+            val projectedLength = current.length + segment.length + if (needsNewLine) 1 else 0
+            if (projectedLength > maxChars) {
+                flushCurrent()
+            }
+            if (current.isNotEmpty()) current.append('\n')
+            current.append(segment)
+        }
+
+        for (line in text.lines()) {
+            if (line.length > maxChars) {
+                var start = 0
+                while (start < line.length) {
+                    val end = (start + maxChars).coerceAtMost(line.length)
+                    appendSegment(line.substring(start, end))
+                    start = end
+                }
+            } else {
+                appendSegment(line)
+            }
+        }
+
+        flushCurrent()
 
         return chunks.map { it.toString() }
     }
