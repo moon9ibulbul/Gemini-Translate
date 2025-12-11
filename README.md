@@ -1,6 +1,6 @@
 # AstralTL
 
-AstralTL adalah aplikasi penerjemah berbasis Gemini API dengan dua gaya terjemahan berdampingan untuk memudahkan perbandingan nada natural dan semi formal. Pengguna dapat menyimpan API key, memilih model (default `gemini-3.0-pro`), mengganti prompt gaya terjemahan, serta memilih tema cerah, gelap, atau mengikuti sistem.
+AstralTL adalah aplikasi penerjemah berbasis Gemini API dengan dua gaya terjemahan berdampingan untuk memudahkan perbandingan nada natural dan semi formal. Pengguna dapat menyimpan API key, memilih model (default `gemini-3-pro-preview`), mengganti prompt gaya terjemahan, serta memilih tema cerah, gelap, atau mengikuti sistem.
 
 ## Menjalankan build debug
 

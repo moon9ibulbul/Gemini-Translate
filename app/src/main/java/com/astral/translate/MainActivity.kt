@@ -12,10 +12,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -312,8 +310,7 @@ fun LineByLineComparison(
         Text(text = "Perbandingan per baris", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         Card(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             border = BorderStroke(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outline)
         ) {
@@ -324,12 +321,8 @@ fun LineByLineComparison(
                     style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
                 )
             } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 320.dp)
-                ) {
-                    items(linePairs) { (leftLine, rightLine) ->
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    linePairs.forEachIndexed { index, (leftLine, rightLine) ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -349,7 +342,7 @@ fun LineByLineComparison(
                                 style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
                             )
                         }
-                        Divider()
+                        if (index != linePairs.lastIndex) Divider()
                     }
                 }
             }
@@ -379,6 +372,8 @@ fun SettingsSheet(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .imePadding()
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -400,8 +395,8 @@ fun SettingsSheet(
                 modelText = it
                 onModelChange(it)
             },
-            label = "Model (default gemini-3.0-pro)",
-            placeholder = "gemini-3.0-pro",
+            label = "Model (default gemini-3-pro-preview)",
+            placeholder = "gemini-3-pro-preview",
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
