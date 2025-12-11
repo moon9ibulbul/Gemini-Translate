@@ -6,6 +6,7 @@ import com.astral.translate.data.GeminiTranslator
 import com.astral.translate.data.SettingsRepository
 import com.astral.translate.data.ThemeOption
 import com.astral.translate.data.UserSettings
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -84,18 +85,24 @@ class MainViewModel(
     }
 
     private suspend fun translateDual(settings: UserSettings, text: String): Pair<String, String> {
-        val left = translator.translate(
-            apiKey = settings.apiKey,
-            model = settings.model,
-            sourceText = text,
-            stylePrompt = settings.leftPrompt,
-        )
-        val right = translator.translate(
-            apiKey = settings.apiKey,
-            model = settings.model,
-            sourceText = text,
-            stylePrompt = settings.rightPrompt,
-        )
-        return left to right
+        return kotlinx.coroutines.coroutineScope {
+            val left = async {
+                translator.translate(
+                    apiKey = settings.apiKey,
+                    model = settings.model,
+                    sourceText = text,
+                    stylePrompt = settings.leftPrompt,
+                )
+            }
+            val right = async {
+                translator.translate(
+                    apiKey = settings.apiKey,
+                    model = settings.model,
+                    sourceText = text,
+                    stylePrompt = settings.rightPrompt,
+                )
+            }
+            left.await() to right.await()
+        }
     }
 }

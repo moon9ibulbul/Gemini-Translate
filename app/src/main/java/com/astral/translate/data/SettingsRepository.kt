@@ -36,7 +36,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
             val themeOption = ThemeOption.entries.getOrElse(themeOrdinal ?: ThemeOption.SYSTEM.ordinal) { ThemeOption.SYSTEM }
             UserSettings(
                 apiKey = prefs[Keys.apiKey] ?: "",
-                model = prefs[Keys.model] ?: "gemini-3.0-pro",
+                model = prefs[Keys.model] ?: "gemini-3-pro-preview",
                 leftPrompt = prefs[Keys.leftPrompt] ?: DEFAULT_LEFT_PROMPT,
                 rightPrompt = prefs[Keys.rightPrompt] ?: DEFAULT_RIGHT_PROMPT,
                 theme = themeOption

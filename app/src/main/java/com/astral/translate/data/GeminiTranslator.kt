@@ -16,7 +16,7 @@ class GeminiTranslator {
         if (sanitizedText.isEmpty()) return@withContext ""
 
         val generativeModel = GenerativeModel(
-            modelName = model.ifBlank { "gemini-3.0-pro" },
+            modelName = model.ifBlank { "gemini-3-pro-preview" },
             apiKey = apiKey,
         )
 
@@ -36,10 +36,8 @@ class GeminiTranslator {
         appendLine()
         appendLine("Instruksi wajib:")
         appendLine("- Ikuti gaya bahasa dan bahasa target sesuai prompt gaya di atas.")
-        appendLine("- Pertahankan jumlah baris agar sejajar dengan teks sumber untuk memudahkan perbandingan.")
         appendLine("- Bila ada konteks dialog, gunakan pasangan kata ganti yang tepat.")
         appendLine("- Hanya keluarkan hasil terjemahan tanpa pengantar atau penjelasan tambahan.")
-        appendLine("- Setiap baris hasil harus langsung sejajar dengan baris sumber, termasuk baris kosong jika ada.")
         appendLine()
         appendLine("Teks sumber:")
         appendLine(source)
@@ -62,7 +60,7 @@ class GeminiTranslator {
         }
     }
 
-    private fun chunkText(text: String, maxChars: Int = 4_000): List<String> {
+    private fun chunkText(text: String, maxChars: Int = 12_000): List<String> {
         if (text.length <= maxChars) return listOf(text)
 
         val lines = text.lines()
