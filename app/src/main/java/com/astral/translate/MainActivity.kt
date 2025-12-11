@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +12,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,6 +27,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,13 +45,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -205,6 +211,12 @@ fun MainScreen(
                     modifier = Modifier.weight(1f)
                 )
             }
+
+            LineByLineComparison(
+                leftText = state.leftTranslation,
+                rightText = state.rightTranslation,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 
@@ -280,6 +292,69 @@ fun TextFieldWithLabel(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions
     )
+}
+
+@Composable
+fun LineByLineComparison(
+    leftText: String,
+    rightText: String,
+    modifier: Modifier = Modifier,
+) {
+    val hasContent = leftText.isNotBlank() || rightText.isNotBlank()
+    val leftLines = leftText.split("\n")
+    val rightLines = rightText.split("\n")
+    val maxLines = maxOf(leftLines.size, rightLines.size)
+    val linePairs = List(maxLines) { index ->
+        leftLines.getOrNull(index).orEmpty() to rightLines.getOrNull(index).orEmpty()
+    }
+
+    Column(modifier = modifier) {
+        Text(text = "Perbandingan per baris", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            border = BorderStroke(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outline)
+        ) {
+            if (!hasContent) {
+                Text(
+                    text = "Hasil per baris akan tampil di sini",
+                    modifier = Modifier.padding(12.dp),
+                    style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 320.dp)
+                ) {
+                    items(linePairs) { (leftLine, rightLine) ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = leftLine,
+                                modifier = Modifier.weight(1f),
+                                fontFamily = FontFamily.Monospace,
+                                style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                            )
+                            Text(
+                                text = rightLine,
+                                modifier = Modifier.weight(1f),
+                                fontFamily = FontFamily.Monospace,
+                                style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                        Divider()
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
