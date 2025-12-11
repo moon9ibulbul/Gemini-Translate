@@ -35,7 +35,7 @@ class GeminiTranslator {
         appendLine(stylePrompt)
         appendLine()
         appendLine("Instruksi wajib:")
-        appendLine("- Semua bahasa sumber diterjemahkan ke bahasa Indonesia.")
+        appendLine("- Ikuti gaya bahasa dan bahasa target sesuai prompt gaya di atas.")
         appendLine("- Pertahankan jumlah baris agar sejajar dengan teks sumber untuk memudahkan perbandingan.")
         appendLine("- Bila ada konteks dialog, gunakan pasangan kata ganti yang tepat.")
         appendLine("- Hanya keluarkan hasil terjemahan tanpa pengantar atau penjelasan tambahan.")
